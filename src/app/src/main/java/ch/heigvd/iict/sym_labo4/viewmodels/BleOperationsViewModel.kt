@@ -11,7 +11,10 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import no.nordicsemi.android.ble.BleManager
+import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
+import java.util.*
+
 
 /**
  * Project: Labo4
@@ -26,6 +29,7 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
 
     //live data - observer
     val isConnected = MutableLiveData(false)
+    val temperature = MutableLiveData<Int>()
 
     //Services and Characteristics of the SYM Pixl
     private var timeService: BluetoothGattService? = null
@@ -34,6 +38,10 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
     private var integerChar: BluetoothGattCharacteristic? = null
     private var temperatureChar: BluetoothGattCharacteristic? = null
     private var buttonClickChar: BluetoothGattCharacteristic? = null
+    private val SYM_CUSTOM_SERVICE_UUID =
+            UUID.fromString("3c0a1000-281d-4b48-b2a7-f15579a1c38f")
+    private val TEMP_C_UUID =
+            UUID.fromString("3c0a1002-281d-4b48-b2a7-f15579a1c38f")
 
     override fun onCleared() {
         super.onCleared()
@@ -63,10 +71,10 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
      */
 
     fun readTemperature(): Boolean {
-        if (!isConnected.value!! || temperatureChar == null)
-            return false
+        return if (!isConnected.value!! || temperatureChar == null)
+            false
         else
-            return ble.readTemperature()
+            ble.readTemperature()
     }
 
     private val bleConnectionObserver: ConnectionObserver = object : ConnectionObserver {
@@ -129,7 +137,15 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                           caractéristiques (déclarés en lignes 39 à 44)
                         */
 
-                        return false //FIXME si tout est OK, on retourne true, sinon la librairie appelera la méthode onDeviceDisconnected() avec le flag REASON_NOT_SUPPORTED
+                        symService = mConnection!!.getService(SYM_CUSTOM_SERVICE_UUID)
+                        temperatureChar = symService!!.getCharacteristic(TEMP_C_UUID)
+
+                        return if (temperatureChar != null)
+                            true
+                        else {
+                            bleConnectionObserver.onDeviceDisconnected(bluetoothDevice, ConnectionObserver.REASON_NOT_SUPPORTED)
+                            false //si tout est OK, on retourne true, sinon la librairie appelera la méthode onDeviceDisconnected() avec le flag REASON_NOT_SUPPORTED
+                        }
                     }
 
                     override fun initialize() {
@@ -156,13 +172,16 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
         }
 
         fun readTemperature(): Boolean {
-            /*  TODO
+            /*
                 on peut effectuer ici la lecture de la caractéristique température
                 la valeur récupérée sera envoyée à l'activité en utilisant le mécanisme
                 des MutableLiveData
                 On placera des méthodes similaires pour les autres opérations
             */
-            return false //FIXME
+            readCharacteristic(temperatureChar).with { device, data ->
+                temperature.postValue(data.getIntValue(Data.FORMAT_UINT16, 0)!! / 10)
+            }.enqueue()
+            return mConnection!!.readCharacteristic(temperatureChar)
         }
     }
 
