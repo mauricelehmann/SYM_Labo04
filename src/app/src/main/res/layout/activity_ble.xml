@@ -25,50 +25,115 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tempLabelTextView"
+                    android:id="@+id/text_view_temp_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ble_temperature_title"
-                    android:textSize="30sp"
+                    android:textSize="25sp"
                     android:layout_marginEnd="30dp" />
 
                 <TextView
-                    android:id="@+id/tempTextView"
+                    android:id="@+id/text_view_temp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/nbCelsius"
-                    android:textSize="30sp" />
+                    android:text="@string/nb_celsius_placeholder"
+                    android:textSize="25sp" />
 
             </LinearLayout>
-
             <Button
-                android:id="@+id/getTemperatureButton"
+                android:id="@+id/button_get_temp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/ble_temperature_read" />
+                android:text="@string/ble_temperature_read"
+                android:layout_marginBottom="50dp"/>
+
+
 
             <!-- Nombre de boutons cliqués -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="50dp">
+
+                <TextView
+                    android:id="@+id/text_view_clicks_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ble_clickcounter_title"
+                    android:textSize="25sp"
+                    android:layout_marginEnd="30dp" />
+
+                <TextView
+                    android:id="@+id/text_view_clicks_nb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:text="@string/nb_clicks_placeholder"
+                    android:textSize="25sp" />
+            </LinearLayout>
+
+            <!-- Entier à envoyer au périphérique -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/clicksLabelTextView"
+                    android:id="@+id/text_view_integer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/ble_clickcounter_title"
-                    android:textSize="30sp"
+                    android:labelFor="@id/edit_text_integer"
+                    android:textSize="25sp"
+                    android:text="@string/ble_sendvalue_title"
                     android:layout_marginEnd="30dp" />
 
+                <EditText
+                    android:id="@+id/edit_text_integer"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="integer"
+                    android:textSize="25sp"
+                    android:inputType="numberDecimal" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/button_send_integer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ble_sendvalue_send"
+                android:layout_marginBottom="50dp"/>
+
+            <!-- Heure du périphérique -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
                 <TextView
-                    android:id="@+id/clicksNBTextView"
+                    android:id="@+id/text_view_time_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ble_currenttime_title"
+                    android:textSize="25sp"
+                    android:layout_marginEnd="30dp"/>
+
+                <TextView
+                    android:id="@+id/text_view_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="bottom"
-                    android:text="@string/nbClicks"
-                    android:textSize="30sp" />
+                    android:text="@string/time_placeholder"
+                    android:textSize="25sp"/>
+
             </LinearLayout>
+
+            <Button
+                android:id="@+id/button_send_current_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ble_currenttime_set" />
 
         </LinearLayout>
 

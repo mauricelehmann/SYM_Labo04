@@ -14,7 +14,6 @@ import no.nordicsemi.android.ble.BleManager
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
 import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import java.util.*
 
 
@@ -81,7 +80,7 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
         mConnection?.disconnect()
     }
 
-    /* TODO
+    /*
         vous pouvez placer ici les différentes méthodes permettant à l'utilisateur
         d'interagir avec le périphérique depuis l'activité
      */
@@ -134,7 +133,9 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
         override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
             if(reason == ConnectionObserver.REASON_NOT_SUPPORTED) {
                 Log.d(TAG, "onDeviceDisconnected - not supported")
-                Toast.makeText(getApplication(), "Device not supported - implement method isRequiredServiceSupported()", Toast.LENGTH_LONG).show()
+                Toast.makeText(getApplication()
+                        , "Device not supported - implement method isRequiredServiceSupported()"
+                        , Toast.LENGTH_LONG).show()
             }
             else
                 Log.d(TAG, "onDeviceDisconnected")
@@ -159,7 +160,7 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
 
                         Log.d(TAG, "isRequiredServiceSupported - TODO")
 
-                        /* TODO
+                        /*
                         - Nous devons vérifier ici que le périphérique auquel on vient de se connecter possède
                           bien tous les services et les caractéristiques attendues, on vérifiera aussi que les
                           caractéristiques présentent bien les opérations attendues
@@ -181,21 +182,32 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                         else {
                             bleConnectionObserver.onDeviceDisconnected(bluetoothDevice,
                                     ConnectionObserver.REASON_NOT_SUPPORTED)
-                            false //si tout est OK, on retourne true, sinon la librairie appelera la méthode onDeviceDisconnected() avec le flag REASON_NOT_SUPPORTED
+                            false //si tout est OK, on retourne true, sinon la librairie appelera la
+                                  //méthode onDeviceDisconnected() avec le flag REASON_NOT_SUPPORTED
                         }
                     }
 
                     override fun initialize() {
-                        /*  TODO
-                            Ici nous somme sûr que le périphérique possède bien tous les services et caractéristiques
-                            attendus et que nous y sommes connectés. Nous pouvous effectuer les premiers échanges BLE:
-                            Dans notre cas il s'agit de s'enregistrer pour recevoir les notifications proposées par certaines
-                            caractéristiques, on en profitera aussi pour mettre en place les callbacks correspondants.
+                        /*
+                            Ici nous somme sûr que le périphérique possède bien tous les services
+                            et caractéristiques attendus et que nous y sommes connectés. Nous
+                            pouvous effectuer les premiers échanges BLE: Dans notre cas il s'agit de
+                            s'enregistrer pour recevoir les notifications proposées par certaines
+                            caractéristiques, on en profitera aussi pour mettre en place les
+                            callbacks correspondants.
                          */
                         setNotificationCallback(buttonClickChar).with { _, data ->
                             buttonClicks.value = data.getIntValue(Data.FORMAT_UINT8, 0)
                         }
+                        setNotificationCallback(currentTimeChar).with { _, data ->
+                            currentTime.value = String.format("%02d:%02d:%02d",
+                                    data.getIntValue(Data.FORMAT_UINT8, HOUR_ID)!!.toInt(),
+                                    data.getIntValue(Data.FORMAT_UINT8, MIN_ID)!!.toInt(),
+                                    data.getIntValue(Data.FORMAT_UINT8, SEC_ID)!!.toInt())
+                        }
+
                         enableNotifications(buttonClickChar).enqueue()
+                        enableNotifications(currentTimeChar).enqueue()
                     }
 
                     override fun onDeviceDisconnected() {
@@ -220,21 +232,15 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                 On placera des méthodes similaires pour les autres opérations
             */
             readCharacteristic(temperatureChar).with { _, data ->
-                temperature.postValue(data.getIntValue(Data.FORMAT_UINT16, 0)!! / 10)
+                temperature
+                        .postValue(data.getIntValue(Data.FORMAT_UINT16, 0)!! / 10)
             }.enqueue()
             return mConnection!!.readCharacteristic(temperatureChar)
         }
 
         fun sendInt(value: Int): Boolean {
-            val bb = ByteBuffer.allocate(4)
-            bb.order(ByteOrder.LITTLE_ENDIAN)
-            bb.putInt(value)
-
-            writeCharacteristic(integerChar, Data.from(integerChar!!)).with { _, _ ->
-                Toast.makeText(context, "Write successfully done",
-                        Toast.LENGTH_SHORT).show()
-            }.enqueue()
-
+            val bb = ByteBuffer.allocate(4).putInt(value).array()
+            writeCharacteristic(integerChar, bb).enqueue()
             return mConnection!!.writeCharacteristic(integerChar)
         }
 

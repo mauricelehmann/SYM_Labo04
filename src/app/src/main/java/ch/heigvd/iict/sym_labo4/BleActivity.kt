@@ -36,9 +36,17 @@ class BleActivity : BaseTemplateActivity() {
     private lateinit var scanPanel: View
     private lateinit var scanResults: ListView
     private lateinit var emptyScanResults: TextView
+    //temperature
     private lateinit var tempTextView: TextView
     private lateinit var tempBtnRead: Button
+    //clicked button
     private lateinit var clicksTextView: TextView
+    //send integer
+    private lateinit var intEditText: EditText
+    private lateinit var intBtnSend: Button
+    //time
+    private lateinit var timeTextView: TextView
+    private lateinit var timeBtnSend: Button
 
     //menu elements
     private var scanMenuBtn: MenuItem? = null
@@ -64,13 +72,21 @@ class BleActivity : BaseTemplateActivity() {
         bluetoothAdapter = bluetoothManager.adapter
 
         //link GUI
-        operationPanel = findViewById(R.id.ble_operation)
-        scanPanel = findViewById(R.id.ble_scan)
-        scanResults = findViewById(R.id.ble_scanresults)
+        operationPanel   = findViewById(R.id.ble_operation)
+        scanPanel        = findViewById(R.id.ble_scan)
+        scanResults      = findViewById(R.id.ble_scanresults)
         emptyScanResults = findViewById(R.id.ble_scanresults_empty)
-        tempTextView = findViewById(R.id.tempTextView)
-        tempBtnRead = findViewById(R.id.getTemperatureButton)
-        clicksTextView = findViewById(R.id.clicksNBTextView)
+        //temp
+        tempTextView     = findViewById(R.id.text_view_temp)
+        tempBtnRead      = findViewById(R.id.button_get_temp)
+        //clicks
+        clicksTextView   = findViewById(R.id.text_view_clicks_nb)
+        //send int
+        intEditText      = findViewById(R.id.edit_text_integer)
+        intBtnSend       = findViewById(R.id.button_send_integer)
+        //time
+        timeTextView     = findViewById(R.id.text_view_time)
+        timeBtnSend      = findViewById(R.id.button_send_current_time)
 
         //manage scanned item
         scanResultsAdapter = ResultsAdapter(this)
@@ -92,15 +108,24 @@ class BleActivity : BaseTemplateActivity() {
             }
         }
 
-        tempBtnRead.setOnClickListener { bleViewModel.readTemperature() }
-
         //ble events
         bleViewModel.isConnected.observe(this, { updateGui() })
 
+        //temp events
+        tempBtnRead.setOnClickListener { bleViewModel.readTemperature() }
         bleViewModel.temperature.observe(this)
         { temp -> tempTextView.text = String.format(Locale.getDefault(), "%d°C", temp) }
 
-        bleViewModel.buttonClicks.observe(this) {c -> clicksTextView.text = c.toString()}
+        //clicks events
+        bleViewModel.buttonClicks.observe(this) { c -> clicksTextView.text = c.toString()}
+
+        //int events
+        intBtnSend.setOnClickListener {
+            intEditText.text.toString().let { bleViewModel.sendInt(it.toInt()) }
+        }
+
+        //time events
+        bleViewModel.currentTime.observe(this) {time -> timeTextView.text = time}
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
