@@ -1,26 +1,30 @@
 package ch.heigvd.iict.sym_labo4
 
-import ch.heigvd.iict.sym_labo4.abstractactivies.BaseTemplateActivity
 import android.bluetooth.BluetoothAdapter
-import ch.heigvd.iict.sym_labo4.viewmodels.BleOperationsViewModel
-import ch.heigvd.iict.sym_labo4.adapters.ResultsAdapter
-import android.os.Bundle
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.*
-import androidx.lifecycle.ViewModelProvider
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.ParcelUuid
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.lifecycle.ViewModelProvider
+import ch.heigvd.iict.sym_labo4.abstractactivies.BaseTemplateActivity
+import ch.heigvd.iict.sym_labo4.adapters.ResultsAdapter
+import ch.heigvd.iict.sym_labo4.viewmodels.BleOperationsViewModel
+import java.util.*
 
 /**
  * Project: Labo4
  * Created by fabien.dutoit on 11.05.2019
  * Updated by fabien.dutoit on 06.11.2020
  * (C) 2019 - HEIG-VD, IICT
+ *
+ * Updated for the assignment by soulaymane.lamrani on 23.01.2021
  */
 class BleActivity : BaseTemplateActivity() {
     //system services
@@ -34,6 +38,17 @@ class BleActivity : BaseTemplateActivity() {
     private lateinit var scanPanel: View
     private lateinit var scanResults: ListView
     private lateinit var emptyScanResults: TextView
+    //temperature
+    private lateinit var tempTextView: TextView
+    private lateinit var tempBtnRead: Button
+    //clicked button
+    private lateinit var clicksTextView: TextView
+    //send integer
+    private lateinit var intEditText: EditText
+    private lateinit var intBtnSend: Button
+    //time
+    private lateinit var timeTextView: TextView
+    private lateinit var timeBtnSend: Button
 
     //menu elements
     private var scanMenuBtn: MenuItem? = null
@@ -45,6 +60,10 @@ class BleActivity : BaseTemplateActivity() {
     //states
     private var handler = Handler(Looper.getMainLooper())
 
+    //characteristics uuids
+    private val PARCEL_UUID_CUSTOM_SYM =
+            ParcelUuid(UUID.fromString("3c0a1000-281d-4b48-b2a7-f15579a1c38f"))
+
     private var isScanning = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,10 +74,21 @@ class BleActivity : BaseTemplateActivity() {
         bluetoothAdapter = bluetoothManager.adapter
 
         //link GUI
-        operationPanel = findViewById(R.id.ble_operation)
-        scanPanel = findViewById(R.id.ble_scan)
-        scanResults = findViewById(R.id.ble_scanresults)
+        operationPanel   = findViewById(R.id.ble_operation)
+        scanPanel        = findViewById(R.id.ble_scan)
+        scanResults      = findViewById(R.id.ble_scanresults)
         emptyScanResults = findViewById(R.id.ble_scanresults_empty)
+        //temp
+        tempTextView     = findViewById(R.id.text_view_temp)
+        tempBtnRead      = findViewById(R.id.button_get_temp)
+        //clicks
+        clicksTextView   = findViewById(R.id.text_view_clicks_nb)
+        //send int
+        intEditText      = findViewById(R.id.edit_text_integer)
+        intBtnSend       = findViewById(R.id.button_send_integer)
+        //time
+        timeTextView     = findViewById(R.id.text_view_time)
+        timeBtnSend      = findViewById(R.id.button_send_current_time)
 
         //manage scanned item
         scanResultsAdapter = ResultsAdapter(this)
@@ -82,6 +112,23 @@ class BleActivity : BaseTemplateActivity() {
 
         //ble events
         bleViewModel.isConnected.observe(this, { updateGui() })
+
+        //temp events
+        tempBtnRead.setOnClickListener { bleViewModel.readTemperature() }
+        bleViewModel.temperature.observe(this)
+        { temp -> tempTextView.text = String.format(Locale.getDefault(), "%d°C", temp) }
+
+        //clicks events
+        bleViewModel.buttonClicks.observe(this) { c -> clicksTextView.text = c.toString()}
+
+        //int events
+        intBtnSend.setOnClickListener {
+            intEditText.text.toString().let { bleViewModel.sendInt(it.toInt()) }
+        }
+
+        //time events
+        bleViewModel.currentTime.observe(this) {time -> timeTextView.text = time}
+        timeBtnSend.setOnClickListener {bleViewModel.sendTime()}
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -139,7 +186,8 @@ class BleActivity : BaseTemplateActivity() {
         }
     }
 
-    //this method need user granted localisation permission, our demo app is requesting it on MainActivity
+    // this method need user granted localisation permission,
+    // our demo app is requesting it on MainActivity
     private fun scanLeDevice(enable: Boolean) {
         val bluetoothScanner = bluetoothAdapter.bluetoothLeScanner
 
@@ -151,12 +199,17 @@ class BleActivity : BaseTemplateActivity() {
 
             //we scan for any BLE device
             //we don't filter them based on advertised services...
-            // TODO ajouter un filtre pour n'afficher que les devices proposant
+            // ajouter un filtre pour n'afficher que les devices proposant
             // le service "SYM" (UUID: "3c0a1000-281d-4b48-b2a7-f15579a1c38f")
 
             //reset display
             scanResultsAdapter.clear()
-            bluetoothScanner.startScan(null, builderScanSettings.build(), leScanCallback)
+
+            val filter = ScanFilter.Builder().setServiceUuid(PARCEL_UUID_CUSTOM_SYM).build()
+
+            bluetoothScanner.startScan(Collections.singletonList(filter),
+                    builderScanSettings.build(), leScanCallback)
+
             Log.d(TAG, "Start scanning...")
             isScanning = true
 
