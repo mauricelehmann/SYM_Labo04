@@ -13,6 +13,8 @@ import androidx.lifecycle.MutableLiveData
 import no.nordicsemi.android.ble.BleManager
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.util.*
 
 
@@ -28,20 +30,34 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
     private var mConnection: BluetoothGatt? = null
 
     //live data - observer
-    val isConnected = MutableLiveData(false)
-    val temperature = MutableLiveData<Int>()
+    val isConnected  = MutableLiveData(false)
+    val temperature  = MutableLiveData<Int>()
+    val buttonClicks = MutableLiveData<Int>()
+    val currentTime  = MutableLiveData<String>()
 
     //Services and Characteristics of the SYM Pixl
-    private var timeService: BluetoothGattService? = null
-    private var symService: BluetoothGattService? = null
+    private var timeService: BluetoothGattService?            = null
+    private var symService: BluetoothGattService?             = null
     private var currentTimeChar: BluetoothGattCharacteristic? = null
-    private var integerChar: BluetoothGattCharacteristic? = null
+    private var integerChar: BluetoothGattCharacteristic?     = null
     private var temperatureChar: BluetoothGattCharacteristic? = null
     private var buttonClickChar: BluetoothGattCharacteristic? = null
-    private val SYM_CUSTOM_SERVICE_UUID =
-            UUID.fromString("3c0a1000-281d-4b48-b2a7-f15579a1c38f")
-    private val TEMP_C_UUID =
-            UUID.fromString("3c0a1002-281d-4b48-b2a7-f15579a1c38f")
+
+    // Services and Charateristics UUIDs
+    private val SYM_CUS_UUID = UUID.fromString("3c0a1000-281d-4b48-b2a7-f15579a1c38f")
+    private val TIME_S_UUID  = UUID.fromString("00001805-0000-1000-8000-00805f9b34fb")
+    private val INT_C_UUID   = UUID.fromString("3c0a1001-281d-4b48-b2a7-f15579a1c38f")
+    private val TEMP_C_UUID  = UUID.fromString("3c0a1002-281d-4b48-b2a7-f15579a1c38f")
+    private val CTIME_C_UUID = UUID.fromString("00002a2b-0000-1000-8000-00805f9b34fb")
+    private val BTN_C_UUID   = UUID.fromString("3c0a1003-281d-4b48-b2a7-f15579a1c38f")
+
+    //Current Time indexes
+    private val HOUR_ID = 4
+    private val MIN_ID  = 5
+    private val SEC_ID  = 6
+
+    //Current Time size
+    private val CS_SIZE = 10
 
     override fun onCleared() {
         super.onCleared()
@@ -75,6 +91,20 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
             false
         else
             ble.readTemperature()
+    }
+
+    fun sendInt(value: Int): Boolean {
+        return if (!isConnected.value!! || integerChar == null)
+            false
+        else
+            ble.sendInt(value)
+    }
+
+    fun sendTime(): Boolean {
+        return if (!isConnected.value!! || currentTimeChar == null)
+            false
+        else
+            ble.sendTime()
     }
 
     private val bleConnectionObserver: ConnectionObserver = object : ConnectionObserver {
@@ -137,13 +167,20 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                           caractéristiques (déclarés en lignes 39 à 44)
                         */
 
-                        symService = mConnection!!.getService(SYM_CUSTOM_SERVICE_UUID)
+                        symService      = mConnection!!.getService(SYM_CUS_UUID)
                         temperatureChar = symService!!.getCharacteristic(TEMP_C_UUID)
+                        integerChar     = symService!!.getCharacteristic(INT_C_UUID)
+                        buttonClickChar = symService!!.getCharacteristic(BTN_C_UUID)
 
-                        return if (temperatureChar != null)
+                        timeService     = mConnection!!.getService(TIME_S_UUID)
+                        currentTimeChar = timeService!!.getCharacteristic(CTIME_C_UUID)
+
+                        return if (temperatureChar != null && integerChar != null
+                                && buttonClickChar != null && currentTimeChar != null)
                             true
                         else {
-                            bleConnectionObserver.onDeviceDisconnected(bluetoothDevice, ConnectionObserver.REASON_NOT_SUPPORTED)
+                            bleConnectionObserver.onDeviceDisconnected(bluetoothDevice,
+                                    ConnectionObserver.REASON_NOT_SUPPORTED)
                             false //si tout est OK, on retourne true, sinon la librairie appelera la méthode onDeviceDisconnected() avec le flag REASON_NOT_SUPPORTED
                         }
                     }
@@ -155,6 +192,10 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                             Dans notre cas il s'agit de s'enregistrer pour recevoir les notifications proposées par certaines
                             caractéristiques, on en profitera aussi pour mettre en place les callbacks correspondants.
                          */
+                        setNotificationCallback(buttonClickChar).with { _, data ->
+                            buttonClicks.value = data.getIntValue(Data.FORMAT_UINT8, 0)
+                        }
+                        enableNotifications(buttonClickChar).enqueue()
                     }
 
                     override fun onDeviceDisconnected() {
@@ -178,10 +219,27 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                 des MutableLiveData
                 On placera des méthodes similaires pour les autres opérations
             */
-            readCharacteristic(temperatureChar).with { device, data ->
+            readCharacteristic(temperatureChar).with { _, data ->
                 temperature.postValue(data.getIntValue(Data.FORMAT_UINT16, 0)!! / 10)
             }.enqueue()
             return mConnection!!.readCharacteristic(temperatureChar)
+        }
+
+        fun sendInt(value: Int): Boolean {
+            val bb = ByteBuffer.allocate(4)
+            bb.order(ByteOrder.LITTLE_ENDIAN)
+            bb.putInt(value)
+
+            writeCharacteristic(integerChar, Data.from(integerChar!!)).with { _, _ ->
+                Toast.makeText(context, "Write successfully done",
+                        Toast.LENGTH_SHORT).show()
+            }.enqueue()
+
+            return mConnection!!.writeCharacteristic(integerChar)
+        }
+
+        fun sendTime(): Boolean {
+            TODO("Not yet implemented")
         }
     }
 
@@ -192,5 +250,4 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
     init {
         ble.setConnectionObserver(bleConnectionObserver)
     }
-
 }

@@ -38,6 +38,7 @@ class BleActivity : BaseTemplateActivity() {
     private lateinit var emptyScanResults: TextView
     private lateinit var tempTextView: TextView
     private lateinit var tempBtnRead: Button
+    private lateinit var clicksTextView: TextView
 
     //menu elements
     private var scanMenuBtn: MenuItem? = null
@@ -50,7 +51,8 @@ class BleActivity : BaseTemplateActivity() {
     private var handler = Handler(Looper.getMainLooper())
 
     //characteristics uuids
-    private val PARCEL_UUID_CUSTOM_SYM = ParcelUuid(UUID.fromString("3c0a1000-281d-4b48-b2a7-f15579a1c38f"))
+    private val PARCEL_UUID_CUSTOM_SYM =
+            ParcelUuid(UUID.fromString("3c0a1000-281d-4b48-b2a7-f15579a1c38f"))
 
     private var isScanning = false
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +69,8 @@ class BleActivity : BaseTemplateActivity() {
         scanResults = findViewById(R.id.ble_scanresults)
         emptyScanResults = findViewById(R.id.ble_scanresults_empty)
         tempTextView = findViewById(R.id.tempTextView)
-        tempBtnRead = findViewById(R.id.btnGetTemperature)
+        tempBtnRead = findViewById(R.id.getTemperatureButton)
+        clicksTextView = findViewById(R.id.clicksNBTextView)
 
         //manage scanned item
         scanResultsAdapter = ResultsAdapter(this)
@@ -89,13 +92,15 @@ class BleActivity : BaseTemplateActivity() {
             }
         }
 
-        tempBtnRead.setOnClickListener { v -> bleViewModel.readTemperature() }
+        tempBtnRead.setOnClickListener { bleViewModel.readTemperature() }
 
         //ble events
         bleViewModel.isConnected.observe(this, { updateGui() })
 
         bleViewModel.temperature.observe(this)
         { temp -> tempTextView.text = String.format(Locale.getDefault(), "%d°C", temp) }
+
+        bleViewModel.buttonClicks.observe(this) {c -> clicksTextView.text = c.toString()}
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -153,7 +158,8 @@ class BleActivity : BaseTemplateActivity() {
         }
     }
 
-    //this method need user granted localisation permission, our demo app is requesting it on MainActivity
+    // this method need user granted localisation permission,
+    // our demo app is requesting it on MainActivity
     private fun scanLeDevice(enable: Boolean) {
         val bluetoothScanner = bluetoothAdapter.bluetoothLeScanner
 

@@ -13,9 +13,10 @@
     <string name="ble_currenttime_set">Set time</string>
 
     <string name="ble_clickcounter_title">Click counter</string>
+    <string name="nbClicks">&lt;nombre&gt;</string>
 
     <string name="ble_temperature_title">Température</string>
-    <string name="zeroCelsius">°C</string>
+    <string name="nbCelsius">&lt;nombre&gt;°C</string>
     <string name="ble_temperature_read">Read</string>
 
     <string name="ble_sendvalue_title">Envoi de valeur</string>
