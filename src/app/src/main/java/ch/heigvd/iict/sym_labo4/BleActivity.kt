@@ -23,6 +23,8 @@ import java.util.*
  * Created by fabien.dutoit on 11.05.2019
  * Updated by fabien.dutoit on 06.11.2020
  * (C) 2019 - HEIG-VD, IICT
+ *
+ * Updated for the assignment by soulaymane.lamrani on 23.01.2021
  */
 class BleActivity : BaseTemplateActivity() {
     //system services
@@ -126,6 +128,7 @@ class BleActivity : BaseTemplateActivity() {
 
         //time events
         bleViewModel.currentTime.observe(this) {time -> timeTextView.text = time}
+        timeBtnSend.setOnClickListener {bleViewModel.sendTime()}
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

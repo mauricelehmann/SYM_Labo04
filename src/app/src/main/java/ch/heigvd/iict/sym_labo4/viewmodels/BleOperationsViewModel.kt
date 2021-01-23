@@ -22,6 +22,8 @@ import java.util.*
  * Created by fabien.dutoit on 11.05.2019
  * Updated by fabien.dutoit on 06.11.2020
  * (C) 2019 - HEIG-VD, IICT
+ *
+ * Updated for the assignment by soulaymane.lamrani on 23.01.2021
  */
 class BleOperationsViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -51,12 +53,16 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
     private val BTN_C_UUID   = UUID.fromString("3c0a1003-281d-4b48-b2a7-f15579a1c38f")
 
     //Current Time indexes
-    private val HOUR_ID = 4
-    private val MIN_ID  = 5
-    private val SEC_ID  = 6
+    private val HOUR_ID    = 4
+    private val MIN_ID     = 5
+    private val SEC_ID     = 6
 
     //Current Time size
-    private val CS_SIZE = 10
+    private val C_S_SIZE   = 10
+
+    //Current time adjustment
+    private val MONTH_ADJ  = 1
+    private val D_OF_W_ADJ = 2
 
     override fun onCleared() {
         super.onCleared()
@@ -161,11 +167,12 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                         Log.d(TAG, "isRequiredServiceSupported - TODO")
 
                         /*
-                        - Nous devons vérifier ici que le périphérique auquel on vient de se connecter possède
-                          bien tous les services et les caractéristiques attendues, on vérifiera aussi que les
-                          caractéristiques présentent bien les opérations attendues
-                        - On en profitera aussi pour garder les références vers les différents services et
-                          caractéristiques (déclarés en lignes 39 à 44)
+                        - Nous devons vérifier ici que le périphérique auquel on vient de se
+                          connecter possède bien tous les services et les caractéristiques
+                          attendues, on vérifiera aussi que les caractéristiques présentent bien les
+                          opérations attendues
+                        - On en profitera aussi pour garder les références vers les différents
+                          services et caractéristiques (déclarés en lignes 39 à 44)
                         */
 
                         symService      = mConnection!!.getService(SYM_CUS_UUID)
@@ -176,8 +183,8 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                         timeService     = mConnection!!.getService(TIME_S_UUID)
                         currentTimeChar = timeService!!.getCharacteristic(CTIME_C_UUID)
 
-                        return if (temperatureChar != null && integerChar != null
-                                && buttonClickChar != null && currentTimeChar != null)
+                        return if (temperatureChar != null && integerChar     != null &&
+                                   buttonClickChar != null && currentTimeChar != null)
                             true
                         else {
                             bleConnectionObserver.onDeviceDisconnected(bluetoothDevice,
@@ -239,13 +246,27 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
         }
 
         fun sendInt(value: Int): Boolean {
-            val bb = ByteBuffer.allocate(4).putInt(value).array()
-            writeCharacteristic(integerChar, bb).enqueue()
+            writeCharacteristic(integerChar,
+                    ByteBuffer.allocate(4).putInt(value).array()).enqueue()
             return mConnection!!.writeCharacteristic(integerChar)
         }
 
         fun sendTime(): Boolean {
-            TODO("Not yet implemented")
+            val cal = Calendar.getInstance()
+
+            writeCharacteristic(currentTimeChar, ByteBuffer.allocate(C_S_SIZE)
+                    .put((cal.get(Calendar.YEAR) and 0xFF).toByte())
+                    .put(((cal.get(Calendar.YEAR) shr 8) and 0xFF).toByte())
+                    .put(((cal.get(Calendar.MONTH) + MONTH_ADJ) % 12).toByte())
+                    .put(cal.get(Calendar.DAY_OF_MONTH).toByte())
+                    .put(cal.get(Calendar.HOUR_OF_DAY).toByte())
+                    .put(cal.get(Calendar.MINUTE).toByte())
+                    .put(cal.get(Calendar.SECOND).toByte())
+                    .put(((cal.get(Calendar.DAY_OF_WEEK) + D_OF_W_ADJ) % 7).toByte())
+                    .put((cal.get(Calendar.SECOND)/256).toByte())
+                    .put(1.toByte())
+                    .array()).enqueue()
+            return mConnection!!.writeCharacteristic(currentTimeChar)
         }
     }
 
