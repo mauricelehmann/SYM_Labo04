@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# This file is an inkscape wrapper to translate ConTeXt commands to inkscape
+# version 1.0. It pains me so much to have to write this script...
+
+# Remove this directory from PATH...
+THIS_DIR="$(dirname "$(command -v inkscape)")"
+export PATH="$(echo "$PATH" | tr : '\n' | egrep -v "$THIS_DIR/?$" | tr '\n' :)"
+
+# Find the culprit argument and fix it.
+declare -a args
+for arg in "$@"; do
+  if ! echo -- "$arg" | grep -q -- "--export-pdf="; then
+    args+=("$arg")
+  else
+    args+=(--export-type=pdf "--export-filename=${arg#--export-pdf=}")
+  fi
+done
+
+# Re-exec inkscape with the right arguments.
+exec inkscape "${args[@]}"

@@ -1,0 +1,234 @@
+\input ./tools/pandoc2context/pandoc-xhtml.tex
+\input ./setup.tex
+
+\startluacode
+    function xml.functions.processCODE(t)
+        buffers.assign("typesetcode",
+        "\\startCODE[highlight={" ..
+          tostring(xml.attribute(t,"..[tag()='pre'","data-lines"))
+              .. "}]\n" .. tostring(xml.text(t)) .. "\n\\stopCODE")
+        context.getbuffer { "typesetcode" }
+    end
+
+    function xml.functions.processINLINECODE(t)
+        buffers.assign("inlinecode","\\type{" .. tostring(xml.text(t)) .. "}")
+        context.getbuffer { "inlinecode" }
+    end
+\stopluacode
+
+%%% Custom pandoc-xhtml overrides
+\startxmlsetups xml:report1
+  %%% Disable header section. Not used for this document.
+  \xmlsetsetup{\xmldocument}
+    {html|body|div|h1|h2|h3|h4|h5|h6|p|blockquote|span|em|q|b|strong|a|ul|ol|li|dl|dt|dd|hr|br|sup|sub|code|table|thead|tbody|tr|th|td}
+    {xml:*}
+  \xmlsetsetup{\xmldocument}
+    {header|ol/li[@role='doc-endnote']}
+    {}
+  %%% Simpler level1 headings
+  \xmlsetsetup{\xmldocument}
+    {h1}
+    {xml:intro}
+  \xmlsetsetup{\xmldocument}
+    {h2}
+    {xml:h2}
+  \xmlsetsetup{\xmldocument}
+    {h3}
+    {xml:h3}
+  \xmlsetsetup{\xmldocument}
+    {figure}
+    {xml:figure}
+  \xmlsetsetup{\xmldocument}
+    {img}
+    {xml:img}
+  \xmlsetsetup{\xmldocument}
+    {nav[@role='doc-toc']}
+    {xml:toc}
+  \xmlsetsetup{\xmldocument}
+    {pre[contains(@data-fromfile,'yes')]}
+    {xml:filecode}
+  \xmlsetsetup{\xmldocument}
+    {pre/code}
+    {xml:code}
+  \xmlsetsetup{\xmldocument}
+    {!pre/code}
+    {xml:inlinecode}
+  \xmlsetsetup{\xmldocument}
+    {div[@class="columns"]}
+    {xml:columns}
+  \xmlsetsetup{\xmldocument}
+    {u}
+    {xml:underline}
+  \xmlsetsetup{\xmldocument}
+    {del}
+    {xml:strikethrough}
+  \xmlsetsetup{\xmldocument}
+    {sup}
+    {xml:sup}
+  \xmlsetsetup{\xmldocument}
+    {jap}
+    {xml:jap}
+  \xmlsetsetup{\xmldocument}
+    {a[@class='footnote-ref']}
+    {xml:footnote:ref}
+  \xmlsetsetup{\xmldocument}
+    {a[@class='footnote-back']}
+    {}
+  \xmlsetsetup{\xmldocument}
+    {div[@class='footnotes']}
+    {xml:footnotes}
+  \xmlsetsetup{\xmldocument}
+    {page}
+    {xml:pagebreak}
+  \xmlsetsetup{\xmldocument}
+    {table}
+    {xml:table}
+  \xmlsetsetup{\xmldocument}
+    {thead}
+    {xml:table:head}
+  \xmlsetsetup{\xmldocument}
+    {tbody}
+    {xml:table:body}
+  \xmlsetsetup{\xmldocument}
+    {tr}
+    {xml:table:row}
+  \xmlsetsetup{\xmldocument}
+    {th|td}
+    {xml:table:cell}
+\stopxmlsetups
+
+\xmlregistersetup{xml:report1}
+
+% Disable automatic pages in introductions (see bellow)
+\setuphead[intro][page=no]
+
+%%% Compact sections: Some sections may be too small to justify a pagebreak,
+%%% if a section is marked with nopagebreak, skip the newpage.
+\startxmlsetups xml:intro
+  \xmldoifelse{#1}{//h1[contains(@class,'nopagebreak')]}
+    {\page[disable]} % ignore the next request for a page, reset afterwards
+    {\page} % request a pagebreak
+  \intro[\xmlattribute{#1}{..//div}{id}]{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:h2
+  \xmldoif{#1}{//h2[contains(@class,'break')]}
+    {\page}
+  \section[\xmlattribute{#1}{..//div}{id}]{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:h3
+  \xmldoif{#1}{//h3[contains(@class,'break')]}
+    {\page}
+  \subsection[\xmlattribute{#1}{..//div}{id}]{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:ul
+  \startitemize[1, packed, broad, joinedup, nowhite, after]
+    \xmlflush{#1}
+  \stopitemize
+\stopxmlsetups
+
+\startxmlsetups xml:figure
+  \placefigure
+    {\xmlfirst{#1}{/figcaption}}
+    {\xmlfirst{#1}{/img}}
+\stopxmlsetups
+
+\startxmlsetups xml:img
+  \externalfigure[\xmlatt{#1}{src}][fullwidth][factor=fit]
+\stopxmlsetups
+
+\startxmlsetups xml:toc
+  \completecontent[]
+  \page[makeup]
+\stopxmlsetups
+
+% To use it, just add :::{.columns number="x"} in your document where :
+% - x is the number of columns you want
+% - use a minimum amount of 3 ':' before the div class columns and close the
+%   part where you want your columns with the same number of ':'
+\startxmlsetups xml:columns
+  \startcolumns[n=\xmlatt{#1}{data-number}]
+  	\xmlflush{#1}
+  \stopcolumns
+\stopxmlsetups
+
+\startxmlsetups xml:underline
+  \underbar{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:strikethrough
+  \overstrike{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:code
+  \definevimtyping[CODE][syntax=\xmlchainatt{#1}{class}]
+  \pushcatcodetable
+  \setcatcodetable\ctxcatcodes
+  \xmlfunction{#1}{processCODE}
+  \popcatcodetable
+\stopxmlsetups
+
+\startxmlsetups xml:filecode
+  \definevimtyping[CODE][syntax=\xmlchainatt{#1}{class}]
+  \typeCODEfile{\xmlchainatt{#1}{data-file}}
+\stopxmlsetups
+
+\startxmlsetups xml:inlinecode
+  \pushcatcodetable
+  \setcatcodetable\ctxcatcodes
+  \xmlfunction{#1}{processINLINECODE}
+  \popcatcodetable
+\stopxmlsetups
+
+\startxmlsetups xml:jap
+  \usetypescriptfile[osx]
+  \usebodyfont[hiragino-kaku,12pt]
+  \setscript[nihongo]
+  \xmltext{#1}{jap}
+\stopxmlsetups
+
+\startxmlsetups xml:pagebreak
+  \page[yes,reset]
+\stopxmlsetups
+
+\startnotmode[nofootnotes]
+\startxmlsetups xml:footnote:ref
+  \xmlfilter{main}{section[@class='footnotes']/ol/li[@id=idstring('\xmlatt{#1}{href}')]/command(xml:footnote:set)}
+\stopxmlsetups
+\stopnotmode
+
+\startxmlsetups xml:table
+  \startembeddedxtable[option=stretch]
+    \xmlflush{#1}
+  \stopembeddedxtable
+\stopxmlsetups
+
+\startxmlsetups xml:table:head
+  \startxtablehead
+    \xmlflush{#1}
+  \stopxtablehead
+\stopxmlsetups
+
+\startxmlsetups xml:table:body
+  \startxtablebody
+    \xmlflush{#1}
+  \stopxtablebody
+\stopxmlsetups
+
+\startxmlsetups xml:table:row
+  \startxrow
+    \xmlflush{#1}
+  \stopxrow
+\stopxmlsetups
+
+\startxmlsetups xml:table:cell
+  \startxcell
+    \xmlflush{#1}
+  \stopxcell
+\stopxmlsetups
+
+\setupheads[expansion=yes]
+
+\input ./title/title.tex

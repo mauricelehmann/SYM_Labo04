@@ -1,0 +1,946 @@
+\startxmlsetups xml:pandoc
+    \xmlsetsetup{\xmldocument}
+        {html|body|div|h1|h2|h3|h4|h5|h6|p|blockquote|span|em|q|b|strong|a|ul|ol|li|dl|dt|dd|hr|br|sup|sub|code}
+        {xml:*}
+
+    \xmlsetsetup{\xmldocument}
+        {pre/code}
+        {xml:pre:code}
+
+    \xmlsetsetup{\xmldocument}
+        {head/style}
+        {}
+
+    \xmlsetsetup{\xmldocument}
+        {head/meta[@name='date']}
+        {}
+
+    \xmlsetsetup{\xmldocument}
+        {head/title}
+        {xml:doc:title}
+
+    \xmlsetsetup{\xmldocument}
+        {head/meta[@name='subtitle']}
+        {xml:doc:subtitle}
+
+    \xmlsetsetup{\xmldocument}
+        {head/meta[@name='author']}
+        {xml:doc:author}
+
+    \xmlsetsetup{\xmldocument}
+        {h2[contains(@class,'author')]}
+        {xml:title:author}
+
+    \xmlsetsetup{\xmldocument}
+        {(div|span|code)[@lang]}
+        {xml:lang}
+
+    \xmlsetsetup{\xmldocument}
+        {span[contains(@class,'smcp') or contains(@class,'author')]}
+        {xml:smallcaps}
+
+    \xmlsetsetup{\xmldocument}
+        {[contains(@class,'part')]/h1}
+        {xml:part}
+
+    \xmlsetsetup{\xmldocument}
+        {[contains(@class,'part')]/[contains(@class,'level2')]/h2}
+        {xml:h1}
+
+    \xmlsetsetup{\xmldocument}
+        {[contains(@class,'part')]/[contains(@class,'level2')]/[contains(@class,'level3')]/h3}
+        {xml:h2}
+
+    \xmlsetsetup{\xmldocument}
+        {[contains(@class,'part')]/[contains(@class,'level2')]/[contains(@class,'level3')]/[contains(@class,'level4')]/h4}
+        {xml:h3}
+
+    \xmlsetsetup{\xmldocument}
+        {[contains(@class,'part')]/[contains(@class,'level2')]/[contains(@class,'level3')]/[contains(@class,'level4')]/[contains(@class,'level5')]/h5}
+        {xml:h4}
+
+    \xmlsetsetup{\xmldocument}
+        {[contains(@class,'hidden')]/h1}
+        {xml:hidden:h1}
+
+    \xmlsetsetup{\xmldocument}
+        {[@id='header']}
+        {xml:titlepages}
+
+    \xmlsetsetup{\xmldocument}
+        {[@id='copyright' or contains(@class,'rights') or contains(@class,'copyright')]}
+        {xml:rights}
+
+    \xmlsetsetup{\xmldocument}
+        {[@id='dedication' or contains(@class,'dedication')]}
+        {xml:dedication}
+
+    \xmlsetsetup{\xmldocument}
+        {[@id='epigraph' or contains(@class,'epigraph')]}
+        {xml:epigraph}
+
+    \xmlsetsetup{\xmldocument}
+        {[@id='frontmatter' or contains(@class,'frontmatter')]}
+        {xml:frontmatter}
+
+    \xmlsetsetup{\xmldocument}
+        {[@id='bodymatter' or contains(@class,'bodymatter') or
+          @id='mainmatter' or contains(@class,'mainmatter')]}
+        {xml:bodymatter}
+
+    \xmlsetsetup{\xmldocument}
+        {[@id='backmatter' or contains(@class,'backmatter')]}
+        {xml:backmatter}
+
+    \xmlsetsetup{\xmldocument}
+        {[@id='appendices' or contains(@class,'appendices')]}
+        {xml:appendices}
+
+    \xmlsetsetup{\xmldocument}
+        {[@id='colophon' or @id='colofón' or contains(@class,'colophon')]}
+        {xml:colophon}
+
+    \xmlsetsetup{\xmldocument}
+        {[@class='signature-date']}
+        {xml:signaturedate}
+
+    \xmlsetsetup{\xmldocument}
+        {[@class='signature-author']}
+        {xml:signatureauthor}
+
+    \xmlsetsetup{\xmldocument}
+        {span[@label or contains(@class,'tex\letterpercent-logo')]}
+        {xml:tex:logo}
+
+    \xmlsetsetup{\xmldocument}
+        {a[contains(@href,'\letterhat\letterhash[A-Za-z]')]}
+        {xml:internal:link}
+
+    \xmlsetsetup{\xmldocument}
+        {[@class='hyphenatedword']} % for testing purposes
+        {xml:hyphenatedword}
+
+    \xmlsetsetup{\xmldocument}
+        {[@class='testlanguage']} % for testing purposes
+        {xml:testlanguage}
+
+    \xmlsetsetup{\xmldocument}
+        {a[@class='footnoteRef']}
+        {xml:footnote:ref}
+
+    \xmlsetsetup{\xmldocument}
+        {div[@class='footnotes']}
+        {}
+
+    \xmlsetsetup{\xmldocument}
+        {div[contains(@class,'centered')]}
+        {xml:centeredblock}
+
+    \xmlsetsetup{\xmldocument}
+        {div[contains(@class,'right\letterpercent-align')]}
+        {xml:rightalignblock}
+
+    \xmlsetsetup{\xmldocument}
+        {div[contains(@class,'left\letterpercent-align')]}
+        {xml:leftalignblock}
+
+    \xmlsetsetup{\xmldocument}
+        {div[contains(@class,'no\letterpercent-indent')]}
+        {xml:no:indent}
+
+    \xmlsetsetup{\xmldocument}
+        {a[@class='uri']}
+        {xml:autolink}
+
+    \xmlsetsetup{\xmldocument}
+        {a[@class='footnoteBack']}
+        {}
+
+    \xmlsetsetup{\xmldocument}
+        {a[text()='↩']}
+        {}
+
+    \xmlsetsetup{\xmldocument}
+        {[contains(@class,'tex\letterpercent-logo')]/(sup|sub)}
+        {xml:texlogo:sup:sub}
+
+    \xmlsetsetup{\xmldocument}
+        {ol[@style='list-style-type: decimal']}
+        {xml:ol}
+
+    \xmlsetsetup{\xmldocument}
+        {ol[@style='list-style-type: lower-alpha']}
+        {xml:loweralphalist}
+
+    \xmlsetsetup{\xmldocument}
+        {ol[@style='list-style-type: upper-alpha']}
+        {xml:upperalphalist}
+
+    \xmlsetsetup{\xmldocument}
+        {ol[@style='list-style-type: lower-roman']}
+        {xml:lowerromanlist}
+
+    \xmlsetsetup{\xmldocument}
+        {ol[@style='list-style-type: upper-roman']}
+        {xml:upperromanlist}
+
+    \xmlsetsetup{\xmldocument}
+        {ol[@style='list-style-type: lower-greek']}
+        {xml:lowergreeklist}
+
+    \xmlsetsetup{\xmldocument}
+        {div[contains(@class,'options')]/dl/dt}
+        {xml:dt_options}
+
+    \xmlsetsetup{\xmldocument}
+        {div[contains(@class,'options')]/dl/dl}
+        {xml:dl_options}
+
+    \xmlsetsetup{\xmldocument}
+        {div[contains(@class,'none')]/dl/dt}
+        {xml:dt_none}
+
+    \xmlsetsetup{\xmldocument}
+        {div[contains(@class,'none')]/dl/dl}
+        {xml:dl_none}
+
+    \xmlsetsetup{\xmldocument}
+        {juh:footnotes}
+        {xml:juh:footnotes}
+
+    \xmlsetsetup{\xmldocument}
+        {[contains(@class,'hidden') and contains(@class,'pagebreak')]/h1}
+        {xml:hidden:pagebreak:h1}
+
+    \xmlsetsetup{\xmldocument}
+        {[contains(@class,'foreignlanguage')]/blockquote}
+        {xml:foreign:blockquote}
+\stopxmlsetups
+
+\xmlregistersetup{xml:pandoc}
+
+\definehead
+    [hiddentitle]
+    [chapter]
+
+\setuphead
+    [hiddentitle]
+    [placehead=empty,
+     incrementnumber=list,
+     number=no,
+     before=,
+     after=,
+      page=,]
+
+\definemakeup
+    [coverpage]
+
+\definemakeup
+    [titlepage]
+
+\definemakeup
+    [copyright]
+
+\definemakeup
+    [colophon]
+
+\definemakeup
+    [dedication]
+
+\definemakeup
+    [epigraph]
+
+\definesectionblock
+    [whatcomeslast]
+    [lastmatter]
+
+\definesectionblock
+    [tocpart]
+    [tableofcontents]
+
+\definesectionblock
+    [whatcomesfirst]
+    [firstmatter]
+
+
+\startxmlsetups xml:html
+    \mainlanguage[\xmlatt{#1}{lang}]
+    \xmlflush{#1}
+\stopxmlsetups
+
+\startxmlsetups xml:body
+    \xmlflush{#1}
+\stopxmlsetups
+
+\startxmlsetups xml:doc:title
+    \setupinteraction[title={\xmlflush{#1}}]
+\stopxmlsetups
+
+\startxmlsetups xml:doc:subtitle
+    \setupinteraction[subtitle={\xmlatt{#1}{content}}]
+\stopxmlsetups
+
+\startxmlsetups xml:title:author
+    \xmlflush{#1}
+\stopxmlsetups
+
+\startxmlsetups xml:titlepages
+    \startfirstmatter
+    \setupinteraction
+        [author={\xmlconcat{#1}{/h2[contains(@class,'author')]}{, }},
+         keyword={\xmldoifelse{#1}{p[@class='publisher']/a}
+                    {\xmltext{#1}{p[@class='publisher']/a}}
+                    {\xmltext{#1}{p[@class='publisher']}}}]
+    \startnotmode[no-coverpage]
+    \startsetups[coverpage]
+    \startcoverpagemakeup
+        \def\CoverPageTitle{%
+        \startmode[*en,*uk]\hiddentitle{[Cover page]}\stopmode%
+        \startmode[*es]\hiddentitle{[Portada]}\stopmode%
+        \startmode[*deo,*de,*de-de,*de-at,*de-ch]\hiddentitle{[Bildtitelseite]}\stopmode%
+        }
+        \doifdefined{hiddentitle}{\CoverPageTitle}
+        \setupbodyfont[svb]
+        {\setupbodyfont[25pt]\setupinterlinespace\sc
+        \getvariable{coverpage}{author}\par}
+        \vfill
+        \scale[width=\textwidth]{\bf \getvariable{coverpage}{title}}
+        \doiftext{\xmltext{#1}{h1[@class='subtitle']}}
+            {\par
+            \blank[small]\startalign [flushright]
+            \dontleavehmode\scale[width=.75\textwidth]%
+                {\em \getvariable{coverpage}{subtitle}}}
+        \stopalign
+        \vfill
+        \startalign[center]
+        \dontleavehmode\CoverImage
+        \stopalign
+        \vfill
+        \startalign[flushright]
+        \dontleavehmode\scale[width=.75\textwidth]%
+            {\getvariable{coverpage}{publisher}}
+        \stopalign
+    \stopcoverpagemakeup
+    \stopsetups
+    \setvariable{coverpage}{set}{\texsetup{coverpage}}
+    \setvariables[coverpage]
+        [title={\xmltext{#1}{h1[@class='title']}},
+         subtitle={\xmltext{#1}{h1[@class='subtitle']}},
+         author={\xmlconcat{#1}{/h2[contains(@class,'author')]}{\\}},
+         date={\xmltext{#1}{h3[@class='date']}},
+         publisher={\xmltext{#1}{p[@class='publisher']}}]
+    \stopnotmode
+
+    \startsetups[titlepage]
+    \starttitlepagemakeup
+        \def\TitlePage{%
+        \startmode[*en,*uk]\hiddentitle{[Title page]}\stopmode%
+        \startmode[*es]\hiddentitle{[Título]}\stopmode%
+        \startmode[*deo,*de,*de-de,*de-at,*de-ch]\hiddentitle{[Titelseite]}\stopmode%
+        }
+        \doifdefined{hiddentitle}{\TitlePage}
+        \vfill
+        {\itd\setupinterlinespace\getvariable{titlepage}{title}
+                \par}\blank[big]
+        \doiftextelse{\getvariable{titlepage}{subtitle}}{
+            {\resetbreakpoints\itb\setupinterlinespace
+            \getvariable{titlepage}{subtitle}\par}\blank[3*big]
+            {\sc \getvariable{titlepage}{author}}
+        } {
+            \par\blank[big]
+            {\sc \getvariable{titlepage}{author}}
+        }
+        \vfill
+        \getvariable{titlepage}{date}
+        \vfill
+        \getvariable{titlepage}{publisher}
+    \stoptitlepagemakeup
+    \stopsetups
+    \setvariable{titlepage}{set}{\texsetup{titlepage}}
+    \setvariables[titlepage]
+        [title={\xmltext{#1}{h1[@class='title']}},
+         subtitle={\xmltext{#1}{h1[@class='subtitle']}},
+         author={\xmlconcat{#1}{/h2[contains(@class,'author')]}{\\}},
+         date={\xmltext{#1}{h3[@class='date']}},
+         publisher={\xmltext{#1}{p[@class='publisher']}}]
+\stopxmlsetups
+
+\startxmlsetups xml:rights
+    \startcopyrightmakeup
+    \xmlflush{#1}
+    \stopcopyrightmakeup
+\stopxmlsetups
+
+\startxmlsetups xml:dedication
+    \startdedicationmakeup
+    \xmlflush{#1}
+    \stopdedicationmakeup
+\stopxmlsetups
+
+\startxmlsetups xml:epigraph
+    \startepigraphmakeup
+    \xmlflush{#1}
+    \stopepigraphmakeup
+\stopxmlsetups
+
+\startxmlsetups xml:frontmatter
+    \doifmode{*whatcomesfirst}{\stopfirstmatter}
+    \startfirstmatter
+    \starttableofcontents
+    \title{\headtext{content}}
+    \placelist[part,chapter]
+    \stoptableofcontents
+    \stopfirstmatter
+
+    \startfrontmatter
+    \xmlflush{#1}
+\stopxmlsetups
+
+\startxmlsetups xml:bodymatter
+    \stopfrontmatter
+
+    \startbodymatter
+    \xmlflush{#1}
+\stopxmlsetups
+
+\startxmlsetups xml:backmatter
+    \doifmode{*bodypart}{\stopbodymatter}
+    \startbackmatter
+    \xmlflush{#1}
+\stopxmlsetups
+
+\startxmlsetups xml:appendices
+    \doifmodeelse{*bodypart}
+        {\stopbodymatter}
+        {\doifmode{*backpart}{\stopbackmatter}}
+    \startappendices
+    \xmlflush{#1}
+\stopxmlsetups
+
+\startxmlsetups xml:juh:footnotes
+    \def\JUHFootnotesTitle{%
+    \startmode[*en,*uk]\chapter{Notes}\stopmode%
+    \startmode[*es]\chapter{Notas}\stopmode%
+    \startmode[*deo,*de,*de-de,*de-at,*de-ch]\chapter{Anmerkungen}\stopmode%
+    \startmode[*fr]\chapter{Notes}\stopmode}
+    \JUHFootnotesTitle\placefootnotes
+\stopxmlsetups
+
+\startxmlsetups xml:colophon
+    \doifmode{*bodypart}{\stopbodymatter}
+    \doifmode{*appendix}{\stopappendices}
+    \doifmode{*backpart}{\stopbackmatter}
+    \startlastmatter
+    \startnotmode[nofootnotes,juh:footnotes]\startmode[endnotes]
+    \def\FootnotesTitle{%
+    \startmode[*en,*uk]\chapter{Notes}\stopmode%
+    \startmode[*es]\chapter{Notas}\stopmode%
+    \startmode[*deo,*de,*de-de,*de-at,*de-ch]\chapter{Anmerkungen}\stopmode%
+    \startmode[*fr]\chapter{Notes}\stopmode}
+    \FootnotesTitle\placefootnotes
+    \stopmode\stopnotmode
+
+    \startcolophonmakeup
+    \xmlflush{#1}
+    \stopcolophonmakeup
+    \stoplastmatter
+\stopxmlsetups
+
+\startxmlsetups xml:div
+    \xmlflush{#1}
+\stopxmlsetups
+
+\startxmlsetups xml:lang
+    \bgroup
+        \language[\xmlatt{#1}{lang}]\xmlsetup{#1}{xml:\xmltag{#1}}
+    \egroup
+\stopxmlsetups
+
+\startxmlsetups xml:part
+    \part[\xmlattribute{#1}{..//div}{id}]{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:h1
+    %~ \startchapter[bookmark={\xmltext{\xmldocument}{../h1}}, title={\xmlflush{#1}}]\stopchapter
+    \chapter[\xmlattribute{#1}{..//div}{id}]{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:hidden:h1
+    \doifdefined{hiddentitle}
+    {\hiddentitle[\xmlattribute{#1}{..//div}{id}]{\xmlflush{#1}}}
+\stopxmlsetups
+
+\startxmlsetups xml:h2
+    \section[\xmlattribute{#1}{..//div}{id}]{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:h3
+    \subsection[\xmlattribute{#1}{..//div}{id}]{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:h4
+    \subsubsection[\xmlattribute{#1}{..//div}{id}]{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:h5
+    \subsubsubsection[\xmlattribute{#1}{..//div}{id}]{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:h6
+    \subsubsubsubsection[\xmlattribute{#1}{..//div}{id}]{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:p
+    \xmldoifnotselfempty {#1} {
+        \dontleavehmode
+        \ignorespaces
+        \xmlflush{#1}
+        \removeunwantedspaces
+    }
+    \par
+\stopxmlsetups
+
+\startxmlsetups xml:blockquote
+    %~ check both modes for mainlanguage and language \doifmodeelse{*en}{\blank\startnarrow\setupindenting[yes,next]\xmlflush{#1}\stopnarrow\blank}    {\blank\startnarrow\xmlflush{#1}\stopnarrow\blank}
+    \startblockquote\xmlflush{#1}\stopblockquote
+\stopxmlsetups
+
+\startxmlsetups xml:hidden:pagebreak:h1
+    \page[yes, header, footer, right]
+\stopxmlsetups
+
+\startxmlsetups xml:foreign:blockquote
+    \startblockquote\em\xmlflush{#1}\stopblockquote
+\stopxmlsetups
+
+\startxmlsetups xml:no:indent
+    \start\setupindenting[no]\xmlflush{#1}\stop
+\stopxmlsetups
+
+\startxmlsetups xml:signaturedate
+    \blank[samepage, big]
+    \startalign[flushright]
+        \xmlflush{#1}
+    \stopalign
+\stopxmlsetups
+
+\startxmlsetups xml:signatureauthor
+    \blank[samepage, big]
+    \startalign[flushright]
+        \bgroup\sc\xmlflush{#1}\egroup
+    \stopalign
+\stopxmlsetups
+
+\startxmlsetups xml:span
+   \xmlflush{#1}
+\stopxmlsetups
+
+\startxmlsetups xml:em
+    \bgroup\em\xmlflush{#1}\egroup
+\stopxmlsetups
+
+\startxmlsetups xml:q
+    \quotation{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:b
+    \bgroup\bf\xmlflush{#1}\egroup
+\stopxmlsetups
+
+\startxmlsetups xml:smallcaps
+    \bgroup\sc\xmlflush{#1}\egroup
+\stopxmlsetups
+
+\startxmlsetups xml:pre:code
+    \bgroup\setupinterlinespace[line=2.8ex]\xmlprettyprint{#1}{none}\egroup
+\stopxmlsetups
+
+\startxmlsetups xml:code % need extra code to work
+    \bgroup\sethyphenationfeatures[underscore]\tt\xmlflushspacewise{#1}\egroup
+\stopxmlsetups
+
+\startxmlsetups xml:strong % used for sans-serif instead of bold
+    \doifmodeelse{strong:ssandnotbf}
+    {\bgroup\ss\xmlflush{#1}\egroup}
+    {\bgroup\bf\xmlflush{#1}\egroup}
+\stopxmlsetups
+
+\startxmlsetups xml:a
+    \href{\xmlatt{#1}{href}}{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:internal:link
+    {\em\doiftext{\in[\xmlrefatt{#1}{href}]}{\in[\xmlrefatt{#1}{href}]. }\about[\xmlrefatt{#1}{href}]}
+\stopxmlsetups
+
+\startxmlsetups xml:autolink
+    \mypersonalurl{\xmlatt{#1}{href}}{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:testlanguage
+    \doiftextelse{\xmlatt{#1}{lang}}
+        {\bgroup
+            \language[\xmlatt{#1}{lang}]\xmlsetup{#1}{xml:\xmltag{#1}}
+            \ \currentdate
+        \egroup}
+        {\xmlflush{#1} \currentdate}
+\stopxmlsetups
+
+\startxmlsetups xml:hyphenatedword
+    \doiftextelse{\xmlatt{#1}{lang}}
+        {\bgroup
+            \language[\xmlatt{#1}{lang}]\hyphenatedword{\xmlsetup{#1}{xml:\xmltag{#1}}}
+        \egroup}
+        {\hyphenatedword{\xmlflush{#1}}}
+\stopxmlsetups
+
+\startxmlsetups xml:centeredblock
+    \startalign[center]\xmlflush{#1}\stopalign
+\stopxmlsetups
+
+\startxmlsetups xml:leftalignblock
+    \startalign[right]
+        \xmlflush{#1}
+    \stopalign
+\stopxmlsetups
+
+\startxmlsetups xml:rightalignblock
+    \startalign[left]\xmlflush{#1}\stopalign
+\stopxmlsetups
+
+\startxmlsetups xml:footnote:set
+     \startfootnote
+         \xmlflush{#1}
+     \stopfootnote
+\stopxmlsetups
+
+\startluacode
+     local gsub = string.gsub
+     function xml.expressions.idstring(str)
+         return type(str) == "string" and gsub(str,"^#","") or ""
+     end
+\stopluacode
+
+\startnotmode[nofootnotes]
+\startxmlsetups xml:footnote:ref
+    \xmlfilter{main}{div[@class='footnotes']/ol/li[@id=idstring('\xmlatt{#1}{href}')]/command(xml:footnote:set)}
+\stopxmlsetups
+\stopnotmode
+
+
+\startxmlsetups xml:ol
+    \xmldoifelse{#1}{/li/p}{
+        \doifnumberelse{\xmlatt{#1}{start}}{
+            \startitemize[n][start=\xmlatt{#1}{start}]
+                \xmlflush{#1}
+            \stopitemize
+            } {
+            \startitemize[n]
+                \xmlflush{#1}
+            \stopitemize}
+        } {
+        \doifnumberelse{\xmlatt{#1}{start}}{
+            \startitemize[n,packed][start=\xmlatt{#1}{start}]
+                \xmlflush{#1}
+            \stopitemize
+            } {
+            \startitemize[n,packed]
+                \xmlflush{#1}
+            \stopitemize}
+    }
+\stopxmlsetups
+
+\startxmlsetups xml:loweralphalist
+    \xmldoifelse{#1}{/li/p}{
+        \doifnumberelse{\xmlatt{#1}{start}}{
+            \startitemize[a][start=\xmlatt{#1}{start}]
+                \xmlflush{#1}
+            \stopitemize
+            } {
+            \startitemize[a]
+                \xmlflush{#1}
+            \stopitemize}
+        } {
+        \doifnumberelse{\xmlatt{#1}{start}}{
+            \startitemize[a,packed][start=\xmlatt{#1}{start}]
+                \xmlflush{#1}
+            \stopitemize
+            } {
+            \startitemize[a,packed]
+                \xmlflush{#1}
+            \stopitemize}
+    }
+\stopxmlsetups
+
+\startxmlsetups xml:upperalphalist
+    \xmldoifelse{#1}{/li/p}{
+        \doifnumberelse{\xmlatt{#1}{start}}{
+            \startitemize[A][start=\xmlatt{#1}{start}]
+                \xmlflush{#1}
+            \stopitemize
+            } {
+            \startitemize[A]
+                \xmlflush{#1}
+            \stopitemize}
+        } {
+        \doifnumberelse{\xmlatt{#1}{start}}{
+            \startitemize[A,packed][start=\xmlatt{#1}{start}]
+                \xmlflush{#1}
+            \stopitemize
+            } {
+            \startitemize[A,packed]
+                \xmlflush{#1}
+            \stopitemize}
+    }
+\stopxmlsetups
+
+\startxmlsetups xml:lowerromanlist
+    \xmldoifelse{#1}{/li/p}{
+        \doifnumberelse{\xmlatt{#1}{start}}{
+            \startitemize[r][start=\xmlatt{#1}{start}]
+                \xmlflush{#1}
+            \stopitemize
+            } {
+            \startitemize[r]
+                \xmlflush{#1}
+            \stopitemize}
+        } {
+        \doifnumberelse{\xmlatt{#1}{start}}{
+            \startitemize[r,packed][start=\xmlatt{#1}{start}]
+                \xmlflush{#1}
+            \stopitemize
+            } {
+            \startitemize[r,packed]
+                \xmlflush{#1}
+            \stopitemize}
+    }
+\stopxmlsetups
+
+\startxmlsetups xml:upperromanlist
+    \xmldoifelse{#1}{/li/p}{
+        \doifnumberelse{\xmlatt{#1}{start}}{
+            \startitemize[R][start=\xmlatt{#1}{start}]
+                \xmlflush{#1}
+            \stopitemize
+            } {
+            \startitemize[R]
+                \xmlflush{#1}
+            \stopitemize}
+        } {
+        \doifnumberelse{\xmlatt{#1}{start}}{
+            \startitemize[R,packed][start=\xmlatt{#1}{start}]
+                \xmlflush{#1}
+            \stopitemize
+            } {
+            \startitemize[R,packed]
+                \xmlflush{#1}
+            \stopitemize}
+    }
+\stopxmlsetups
+
+\startxmlsetups xml:lowergreeklist % not implemented by pandoc
+    \xmldoifelse{#1}{/li/p}{
+        \doifnumberelse{\xmlatt{#1}{start}}{
+            \startitemize[g][start=\xmlatt{#1}{start}]
+                \xmlflush{#1}
+            \stopitemize
+            } {
+            \startitemize[g]
+                \xmlflush{#1}
+            \stopitemize}
+        } {
+        \doifnumberelse{\xmlatt{#1}{start}}{
+            \startitemize[g,packed][start=\xmlatt{#1}{start}]
+                \xmlflush{#1}
+            \stopitemize
+            } {
+            \startitemize[g,packed]
+                \xmlflush{#1}
+            \stopitemize}
+    }
+\stopxmlsetups
+
+\startxmlsetups xml:ul
+     \xmldoifelse{#1}{/li/p}{
+         \startitemize
+             \xmlflush{#1}
+         \stopitemize
+     } {
+         \startitemize[packed]
+             \xmlflush{#1}
+         \stopitemize
+     }
+\stopxmlsetups
+
+
+\startxmlsetups xml:li
+    \startitem
+        \xmlflush{#1}
+    \stopitem
+\stopxmlsetups
+
+\startxmlsetups xml:dl
+    \xmlflush{#1}
+\stopxmlsetups
+
+\startxmlsetups xml:dt
+    \startdescription{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:dd
+    \xmlflush{#1}
+    \stopdescription
+\stopxmlsetups
+
+\startxmlsetups xml:dt_options
+    \startoptions{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:dd_options
+    \xmlflush{#1}
+    \stopoptions
+\stopxmlsetups
+
+\startxmlsetups xml:dd_none
+    \xmlflush{#1}
+    \stopnone
+\stopxmlsetups
+
+\startxmlsetups xml:hr
+    \blank\hrule\blank
+\stopxmlsetups
+
+\startxmlsetups xml:br
+     \crlf
+\stopxmlsetups
+
+\startxmlsetups xml:sup
+     \high{\xmlflush{#1}}
+\stopxmlsetups
+
+\startxmlsetups xml:texlogo:sup:sub
+     \xmlflush{#1}
+\stopxmlsetups
+
+\startxmlsetups xml:sub
+     \low{\xmlflush{#1}}
+\stopxmlsetups
+
+%%% this element is the way to get the TeX and ConTeXt logos
+%%% markdown tagging:
+%%% <span label="tex">TeX</span>
+%%% Sp you get standard text in other formats and logos with ConTeXt
+
+\startxmlsetups xml:logo
+    \executeifdefined{\xmlatt{#1}{label}}{{\tttf ???}}
+\stopxmlsetups
+
+%%% alternate TeX logos
+%%% <span class="tex-logo">TeX</span>
+
+\startxmlsetups xml:tex:logo
+    \executeifdefined{\xmlflush{#1}}{{\tttf ???}}
+\stopxmlsetups
+
+%%% This is a way of having a cover image
+%%% But you might want to have a new cover.
+%%% Default image from (edited by me):
+%%% https://openclipart.org/detail/216016/
+%%% TypographyTribute can be found at:
+%%% http://www.dafont.com/typographytribute.font
+
+\def\CoverImageFile{}%\externalfigure[TypeWriter][width=\textwidth]}
+\definefontfamily[ornamenta][rm][TypographyTribute]
+\def\CoverImageFont{\scale[width=\textwidth]{\ornamenta F}}
+\def\CoverImage{\doifsomethingelse{\CoverImageFile}{\CoverImageFile}{\CoverImageFont}}
+
+%%% This a simple method to have interactive hyperlinks
+
+\unexpanded\def\mypersonalurl#1#2{\bgroup\tt\hw\goto{\hyphenatedurl{#2}}[url(#1)]\egroup}
+\unexpanded\def\href#1#2{\goto{#2} [url(#1)]}
+
+%%% Two samples for definition lists
+
+\definedescription[description][hang=fit, width=fit, headstyle=em, align=justify, margin=yes]
+\definedescription[options][hang=fit, width=fit, headstyle=tt, align=justify, location=left, margin=yes]
+\definedescription[none][width=fit, headstyle=, align=justify, location=left, margin=yes]
+
+%%% These makeups are created (defined) to avoid crashes with
+%%% the current setup. They need to be configured (setup)
+%%% when if we want to use them (otherwise we get only defaults).
+
+\definemakeup[coverpage]
+\definemakeup[titlepage]
+\definemakeup[copyright]
+\definemakeup[dedication]
+\definemakeup[epigraph]
+\definemakeup[colophon]
+
+%%% This command removes unwanted code from bookmarks.
+%%% Just learnt right now in a message from Hans
+%%% to the ConTeXt mailing list
+
+\enabledirectives[references.bookmarks.preroll]
+\appendtoks\def\TeX{TeX}\to\everypreroll
+\appendtoks\def\ConTeXt{ConTeXt}\to\everypreroll
+\appendtoks\def\LaTeX{LaTeX}\to\everypreroll
+
+%%% the current setup. They need to be configured (setup)
+%%% when if we want to use them (otherwise we get only defaults).
+
+%%% These are language synonyms, so that XML values can match
+%%% ConTeXt values (btw, ConTeXt seems to have less languages
+%%% than LaTeX)
+
+\installlanguage [af-ZA] [af]
+\installlanguage [ar-DZ] [ar-dz]
+\installlanguage [ar-IQ] [ar-iq]
+\installlanguage [ar-JO] [ar-jo]
+\installlanguage [ar-LB] [ar-lb]
+\installlanguage [ar-MA] [ar-ma]
+\installlanguage [ar-SY] [ar-sy]
+\installlanguage [bg-BG] [bg]
+\installlanguage [ca-ES] [ca]
+\installlanguage [cy-UK] [cy]
+\installlanguage [cz-CZ] [cz]
+\installlanguage [da-DK] [da]
+\installlanguage [de-1901] [deo]
+\installlanguage [de-AT] [de-at]
+\installlanguage [de-CH] [de-ch]
+\installlanguage [de-DE] [de-de]
+\installlanguage [el] [gr]
+\installlanguage [en-UK] [uk]
+\installlanguage [en-GB] [uk]
+\installlanguage [en-US] [en]
+\installlanguage [es-ES] [es]
+\installlanguage [et-EE] [et]
+\installlanguage [eu-ES] [eu]
+\installlanguage [fi-FI] [fi]
+\installlanguage [fr-CA] [fr]
+\installlanguage [fr-FR] [fr]
+\installlanguage [grc] [agr]
+\installlanguage [he] [il]
+\installlanguage [he-IL] [il]
+\installlanguage [hr-HR] [hr]
+\installlanguage [hu-HU] [hu]
+\installlanguage [is-IS] [is]
+\installlanguage [it-IT] [it]
+\installlanguage [jp] [ja]
+\installlanguage [jp-JP] [ja]
+\installlanguage [nb-NO] [nb]
+\installlanguage [nl-NL] [nl]
+\installlanguage [nn-NO] [nn]
+\installlanguage [no-NO] [no]
+\installlanguage [pl-PL] [pl]
+\installlanguage [pt-BR] [pt]
+\installlanguage [pt-PT] [pt]
+\installlanguage [ro-RO] [ro]
+\installlanguage [ru-RU] [ru]
+\installlanguage [sk-SK] [sk]
+\installlanguage [sl-SL] [sl]
+\installlanguage [sv-SE] [sv]
+\installlanguage [tr-TR] [tr]
+\installlanguage [uk] [ua]
+\installlanguage [uk-UA] [ua]
+\installlanguage [vi] [vn]
+\installlanguage [vi-VN] [vn]

@@ -1,0 +1,148 @@
+\usemodule[vim]
+\setupvimtyping[vimcommand=vim]
+\definevimtyping[CODE][syntax=text,
+                       directory=vimoutput/,
+                       numbering=yes,
+                       numberstep=5,
+                       tab=4,
+                       lines=split,
+                       highlightcolor=lightgreen,
+                       before={\startframedcode},
+                       after={\stopframedcode}]
+
+\setupexternalfigures[directory={images}]
+
+\setuplanguage[fr]
+\mainlanguage[fr]
+\language[fr]
+
+\setuppapersize[A4][A4]
+\setupwhitespace[medium]
+
+% You can change your font here.
+% More info here: https://wiki.contextgarden.net/ConTeXt_distribution%27s_Fonts
+% \usetypescript[dejavu]
+% \setupbodyfont[dejavu,10.5pt]
+
+% https://wiki.contextgarden.net/Fonts_in_LuaTeX
+\starttypescript [myfonts]
+  \definetypeface [myfonts] [rm] [serif] [dejavu]    [default]
+  \definetypeface [myfonts] [tt] [mono]  [dejavu]    [default]
+  \definetypeface [myfonts] [mm] [math]  [modern]    [default]
+  \definetypeface [myfonts] [ss] [sans]  [dejavu]    [default]
+\stoptypescript
+
+\setupbodyfont[myfonts,10.5pt]
+
+\setuplayout[
+                   width=middle,
+                  height=middle,
+                location=middle,
+                topspace=0.55in,
+             bottomspace=0.55in,
+                  bottom=0.25in,
+               backspace=1in,
+                cutspace=1in,
+              leftmargin=.45in,
+             rightmargin=.45in,
+      leftmargindistance=0.05in,
+     rightmargindistance=0.05in,
+                  header=0.20in,
+                  footer=0.30in,
+          headerdistance=0.35in,
+          footerdistance=0.35in,
+        ]
+
+\setupheader
+  [text]
+  [before={\startframed[frame=off,bottomframe=on,framecolor=black,]},
+   after={\stopframed},
+  ]
+
+\startsetups[heigvd]
+  \externalfigure[HEIG-VD-logo.png][width=0.2\textwidth]
+\stopsetups
+
+\startsetups[hesso]
+  \externalfigure[HES-SO-logo.jpg][width=0.13\textwidth]
+\stopsetups
+
+\setupheadertexts[]
+\setupheadertexts[\setups{heigvd}][\setups{hesso}]
+
+\startsetups[topic]
+  SYM - Labo4 - Environnement \convertnumber{R}{2}
+\stopsetups
+
+\startsetups[authors]
+  \framed[frame=off, align=normal, location=top]
+  {Soulaymane Lamrani\\ Maurice Lehmann\\ Alexandre \v{S}imík}
+\stopsetups
+
+\setupfootertexts[pagenumber]
+\setupfootertexts[\setups{topic}][\setups{authors}]
+
+\defineenumeration
+  [remark]
+  [alternative=top,
+   text=Remarque,
+   inbetween={\blank[none]},
+   after=\blank]
+
+\defineconversionset [bodypart:section] [n,Word] [n]
+\defineconversionset [appendix:section] [n,A] [n]
+
+\setupheads
+  [sectionconversionset=section]
+
+\setuplabeltext
+  [fr]
+  [chapter=Chapitre ,
+   appendix=Annexe ]
+
+\defineitemgroup[domain]
+\setupitemgroup[domain][each][1, packed, broad, joinedup, nowhite, after]
+
+\definehead     [intro] [chapter]
+\setuphead      [intro] [number=no,page=yes]
+
+\definecombinedlist     [content][intro,chapter,section]
+\setuplist      [intro] [headnumber=no]
+
+\setuphead[intro][incrementnumber=list]
+\setuplist[content][alternative=c]
+
+\definecolor[myblue][h=62BFFF]
+\definecolor[mygray][h=F0F0F0]
+\definecolor[lightgray][x=F3F3F3]
+\definecolor[lightgreen][x=9FFEB8]
+
+\definetextbackground
+  [framedcode]
+  [framecolor=black,
+   background=color,
+   backgroundcolor=lightgray,
+   strut=yes,
+   offset=2mm,
+   width=\textwidth,
+   location=paragraph,
+   align=right]
+
+\definebackground
+  [blockquote]
+  [
+    framecolor=myblue,
+    background=color,
+    backgroundcolor=mygray,
+    frame=off, 
+    leftframe=on,
+    rulethickness=0.3em,
+    offset=overlay,
+    leftoffset=2em,
+    rightoffset=1em,
+    width=\textwidth,
+    setups=framedsetups,
+    before=\blank,
+    after=\blank,
+  ]
+  
