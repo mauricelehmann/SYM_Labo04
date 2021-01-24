@@ -26,7 +26,10 @@ class MainActivity : AppCompatActivity() {
             val i = Intent(this@MainActivity, CompassActivity::class.java)
             startActivity(i)
         }
-        findViewById<View>(R.id.nav_5).setOnClickListener { startBleActivityWithPermissionCheck() }
+
+        //Maurice : Commenté ça psk ça passait pas à la compil
+        // findViewById<View>(R.id.nav_5).setOnClickListener { startBleActivityWithPermissionCheck() }
+        findViewById<View>(R.id.nav_5).setOnClickListener { startBleActivity() }
     }
 
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
