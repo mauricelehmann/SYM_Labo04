@@ -19,6 +19,9 @@
   <![endif]-->
 </head>
 <body>
+<nav id="TOC" role="doc-toc">
+
+</nav>
 <section id="questions" class="level1">
 <h1>Questions</h1>
 <section id="capteurs" class="level2">
@@ -29,6 +32,12 @@
 <p>Une fois la manipulation effectuée, vous constaterez que les animations de la flèche ne sont pas fluides, il va y avoir un tremblement plus ou moins important même si le téléphone ne bouge pas. Veuillez expliquer quelle est la cause la plus probable de ce tremblement et donner une manière (sans forcément l’implémenter) d’y remédier.</p>
 </blockquote>
 <p>Réponse :</p>
+<p>Nous pensons que cela peut provenir des points suivants:</p>
+<ul>
+<li>La précision des capteurs n’est pas parfaite. En effet même lorsque le smartphone est immobile, les valeurs continuent de changer. Cela peut venir des capteurs ou alors on peut avoir des interférences en fonction de l’endroit ou l’on se trouve.</li>
+<li>Lorsque il y a un changement conséquent la valeur change de manière conséquente. Cela donne une impréssion de “saccadé”, car la valeur “saute” à la suivante suite au changement.</li>
+</ul>
+<p>Pour remédier à cela il s’agit de faire en sorte que changements soient aplatis et que cela offre une sensation de fluidité. la solution que nous proposons est d’utiliser la moyenne mobile pour afficher la valeur à l’écran. (La moyenne mobile est la moyenne des N dernières valeurs.)</p>
 </section>
 </section>
 <section id="communication-bluetooth-low-energy" class="level2">
@@ -39,12 +48,27 @@
 <p>La caractéristique permettant de lire la température retourne la valeur en degrés Celsius,multipliée par 10,sous la forme d’un entier non-signé de 16bits. Quel est l’intérêt de procéder de la sorte? Pourquoi ne pas échanger un nombre à virgule flottante de type float par exemple?</p>
 </blockquote>
 <p>Réponse :</p>
+<p>Généralement un float est sur 32bits. Ainsi en utilisant le système de l’entier non signé, cela prend 2 fois moins de place. Nous pensons donc que c’est pour réduite / économiser la quantité de données échangées.</p>
 <blockquote>
 <p>Le niveau de charge de la pile est à présent indiqué uniquement sur l’écran du périphérique, mais nous souhaiterions que celui-ci puisse informer le smartphone sur son niveau de charge restante.Veuillez spécifier la(les) caractéristique(s) qui composerai(en)t un tel service,mis à disposition par le périphérique et permettant de communiquer le niveau de batterie restant via Bluetooth Low Energy.Pour chaque caractéristique, vous indiquerez les opérations supportées (lecture, écriture, notification, indication, etc.) ainsi que les données échangées et leur format.</p>
 </blockquote>
 <p>Réponse :</p>
+<p>Selon StackOverflow<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, il existe une spécification de la batterie dans Bluetooth. Leur UUID serait :</p>
+<pre class="java"><code>static String BATTERY_SERVICE_UUID
+    = &quot;0000180f-0000-1000-8000-00805f9b34fb&quot;;
+static String BATTERY_LEVEL_UUID
+    = &quot;00002a1b-0000-1000-8000-00805f9b34fb&quot;;</code></pre>
+<p>Il suffirait ensuite de récupérer l’information en vérifiant bien que le service et que la caractéristique soient existants dans le périphérique.</p>
+<p>L’information<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> peut-être lue à la connexion et si le périphérique le prend en charge, il peut également envoyé des notifications sur l’état de la batterie à un niveau critique.</p>
 </section>
 </section>
+</section>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>https://stackoverflow.com/questions/52281070/what-does-battery-level-state-0x2a1b-bluetooth-specification-mean<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>https://developer.parrot.com/docs/FlowerPower/FlowerPower-BLE.pdf<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
 </section>
 </body>
 </html>
